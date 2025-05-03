@@ -83,7 +83,7 @@ const mockNFTs = [
     },
 ];
 
-const Viewer = () => {
+const Assets = () => {
     const [selected, setSelected] = useState([]);
 
     const handleSelect = (id) => (event) => {
@@ -138,4 +138,4 @@ const Viewer = () => {
     );
 };
 
-export default Viewer;
+export default Assets;

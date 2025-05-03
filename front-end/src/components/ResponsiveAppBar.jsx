@@ -17,8 +17,8 @@ import liquidRealEstateLogo from '../assets/liquid_re_logo.png';
 const pages = [
     { name: 'Realtor', path: '/realtor' },
     { name: 'Market', path: '/market' },
-    { name: 'NFT Viewer', path: '/viewer' },
-    { name: 'My Loans', path: '/loans' },
+    { name: 'Assets', path: '/assets' },
+    { name: 'Loans', path: '/loans' },
     { name: 'Investor', path: '/investor' }
 ];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];

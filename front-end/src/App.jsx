@@ -7,7 +7,7 @@ import './App.css'
 import ResponsiveAppBar from './components/ResponsiveAppBar'
 import Realtor from './pages/Realtor'
 import Market from './pages/Market'
-import Viewer from './pages/Viewer'
+import Assets from './pages/Assets'
 import Loans from './pages/Loans'
 import Investor from './pages/Investor'
 
@@ -76,7 +76,7 @@ function App() {
             } />
             <Route path="/realtor" element={<Realtor />} />
             <Route path="/market" element={<Market />} />
-            <Route path="/viewer" element={<Viewer />} />
+            <Route path="/assets" element={<Assets />} />
             <Route path="/loans" element={<Loans />} />
             <Route path="/investor" element={<Investor />} />
           </Routes>
