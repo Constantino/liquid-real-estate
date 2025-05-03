@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { Box, Container, Typography, Button } from '@mui/material'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { ThirdwebProvider } from "thirdweb/react";
 import './App.css'
 import ResponsiveAppBar from './components/ResponsiveAppBar'
 import Realtor from './pages/Realtor'
@@ -47,45 +48,49 @@ const darkTheme = createTheme({
 
 function App() {
   return (
-    <Router>
-      <ThemeProvider theme={darkTheme}>
-        <CssBaseline />
-        <ResponsiveAppBar />
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-          <Routes>
-            <Route path="/" element={
-              <Box
-                sx={{
-                  minHeight: '100vh',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 2,
-                }}
-              >
-                <Typography variant="h1" component="h1" sx={{ mb: 2 }}>
-                  Liquid Real Estate
-                </Typography>
-                <Typography variant="h4" component="h4" sx={{ mb: 2 }}>
-                  Own your piece of real estate with hyper liquidity.
-                </Typography>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Button variant="outlined" color="primary">
-                    Connect Wallet
-                  </Button>
+    <ThirdwebProvider>
+
+
+      <Router>
+        <ThemeProvider theme={darkTheme}>
+          <CssBaseline />
+          <ResponsiveAppBar />
+          <Container maxWidth="lg" sx={{ mt: 4 }}>
+            <Routes>
+              <Route path="/" element={
+                <Box
+                  sx={{
+                    minHeight: '100vh',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 2,
+                  }}
+                >
+                  <Typography variant="h1" component="h1" sx={{ mb: 2 }}>
+                    Liquid Real Estate
+                  </Typography>
+                  <Typography variant="h4" component="h4" sx={{ mb: 2 }}>
+                    Own your piece of real estate with hyper liquidity.
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Button variant="outlined" color="primary">
+                      Connect Wallet
+                    </Button>
+                  </Box>
                 </Box>
-              </Box>
-            } />
-            <Route path="/realtor" element={<Realtor />} />
-            <Route path="/market" element={<Market />} />
-            <Route path="/assets" element={<Assets />} />
-            <Route path="/loans" element={<Loans />} />
-            <Route path="/investor" element={<Investor />} />
-          </Routes>
-        </Container>
-      </ThemeProvider>
-    </Router>
+              } />
+              <Route path="/realtor" element={<Realtor />} />
+              <Route path="/market" element={<Market />} />
+              <Route path="/assets" element={<Assets />} />
+              <Route path="/loans" element={<Loans />} />
+              <Route path="/investor" element={<Investor />} />
+            </Routes>
+          </Container>
+        </ThemeProvider>
+      </Router>
+    </ThirdwebProvider>
   )
 }
 

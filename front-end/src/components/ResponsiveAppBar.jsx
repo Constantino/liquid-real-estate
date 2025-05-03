@@ -13,6 +13,8 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate, Link } from 'react-router-dom';
 import liquidRealEstateLogo from '../assets/liquid_re_logo.png';
+import { ConnectButton, darkTheme, lightTheme } from "thirdweb/react";
+import { createThirdwebClient } from "thirdweb";
 
 const pages = [
     { name: 'Realtor', path: '/realtor' },
@@ -47,6 +49,10 @@ function ResponsiveAppBar() {
         handleCloseNavMenu();
         navigate(path);
     };
+
+    const client = createThirdwebClient({
+        clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
+    });
 
     return (
         <AppBar
@@ -135,7 +141,14 @@ function ResponsiveAppBar() {
                             </Button>
                         ))}
                     </Box>
-                    <Box sx={{ flexGrow: 0 }}>
+                    <ConnectButton theme={darkTheme({
+                        colors: {
+                            primaryButtonBg: 'var(--accent-gradient)',
+                            primaryButtonText: 'var(--text-primary)',
+                        }
+                    })
+                    } client={client} />
+                    {/* <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                                 <Avatar alt="User Avatar" src="/static/images/avatar/2.jpg" />
@@ -169,7 +182,7 @@ function ResponsiveAppBar() {
                                 </MenuItem>
                             ))}
                         </Menu>
-                    </Box>
+                    </Box> */}
                 </Toolbar>
             </Container>
         </AppBar>
