@@ -26,6 +26,23 @@ const darkTheme = createTheme({
   typography: {
     fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
   },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          background: `
+            radial-gradient(ellipse 18% 14% at 90% 8%, rgba(0,255,180,0.13) 0%, rgba(0,255,180,0.04) 60%, rgba(0,0,0,0.0) 100%),
+            radial-gradient(ellipse 60% 40% at 20% 85%, rgba(0,255,180,0.12) 0%, rgba(0,255,180,0.03) 60%, rgba(0,0,0,0.92) 100%),
+            radial-gradient(ellipse 40% 30% at 85% 95%, rgba(0,80,255,0.38) 0%, rgba(0,80,255,0.10) 60%, rgba(0,0,0,0.92) 100%),
+            radial-gradient(ellipse 30% 20% at 60% 80%, rgba(120,0,255,0.13) 0%, rgba(120,0,255,0.04) 60%, rgba(0,0,0,0.92) 100%),
+            linear-gradient(to top, #000 65%, #101014 100%)
+          `,
+          backgroundAttachment: 'fixed',
+          minHeight: '100vh',
+        },
+      },
+    },
+  },
 })
 
 function App() {
