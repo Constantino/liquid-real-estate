@@ -1,34 +1,63 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { Box, Container, Typography, Button } from '@mui/material'
 import './App.css'
+import ButtonAppBar from './components/NavBar'
+
+// Create a dark theme
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#00FF9D',
+    },
+    background: {
+      default: '#0F0F0F',
+      paper: '#1A1A1A',
+    },
+  },
+  typography: {
+    fontFamily: 'Inter, system-ui, Avenir, Helvetica, Arial, sans-serif',
+  },
+})
 
 function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <ThemeProvider theme={darkTheme}>
+      <CssBaseline />
+      <ButtonAppBar />
+      <Container maxWidth="lg">
+        <Box
+          sx={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 2,
+          }}
+        >
+          <Typography variant="h1" component="h1" sx={{ mb: 2 }}>
+            Welcome to Liquid Real Estate
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => setCount((count) => count + 1)}
+            >
+              Count is {count}
+            </Button>
+            <Button variant="outlined" color="primary">
+              Connect Wallet
+            </Button>
+          </Box>
+        </Box>
+      </Container>
+    </ThemeProvider>
   )
 }
 
