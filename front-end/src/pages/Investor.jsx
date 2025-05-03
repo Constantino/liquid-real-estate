@@ -9,6 +9,8 @@ import {
     TableRow,
     Paper,
     Typography,
+    Stack,
+    Chip,
 } from '@mui/material';
 
 const mockDisbursals = [
@@ -18,9 +20,25 @@ const mockDisbursals = [
     { id: 'DSB-004', date: '2024-06-07', amount: '3.0 ETH' },
 ];
 
+const poolStats = [
+    { label: 'Liquidity pool', value: '120.5 ETH' },
+    { label: 'Participation', value: '8.2%' },
+    { label: 'Stake', value: '15.0 ETH' },
+    { label: 'Rewards', value: '0.45 ETH' },
+];
+
 const Investor = () => {
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
+            <Stack direction="column" spacing={2} sx={{ mb: 3, alignItems: 'flex-start' }}>
+                {poolStats.map((stat) => (
+                    <Chip
+                        key={stat.label}
+                        label={<><b>{stat.label}:</b> {stat.value}</>}
+                        sx={{ fontSize: 16, background: 'rgba(0,255,157,0.08)', color: '#00FF9D', fontWeight: 500 }}
+                    />
+                ))}
+            </Stack>
             <Typography variant="h5" sx={{ mb: 3 }}>
                 Disbursals
             </Typography>
