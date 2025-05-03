@@ -115,7 +115,37 @@ const Assets = () => {
                 {mockNFTs.map((nft) => (
                     <Grid item key={nft.id} xs={12} sm={6} md={4} display="flex">
                         <Card
-                            sx={{ background: 'rgba(20, 20, 24, 0.95)', display: 'flex', flexDirection: 'column', height: '100%', cursor: 'pointer', border: selected.includes(nft.id) ? '2px solid #00FF9D' : 'none' }}
+                            sx={{
+                                background: 'rgba(20, 20, 24, 0.95)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                height: '100%',
+                                cursor: 'pointer',
+                                border: selected.includes(nft.id) ? '2px solid #00FF9D' : 'none',
+                                transition: 'box-shadow 0.2s, border-color 0.2s',
+                                boxShadow: selected.includes(nft.id)
+                                    ? '0 0 0 2px #00FF9D'
+                                    : '0 2px 12px 0 rgba(0,0,0,0.12)',
+                                position: 'relative',
+                                overflow: 'hidden',
+                                '&:hover': {
+                                    border: selected.includes(nft.id)
+                                        ? '2px solid #00FF9D'
+                                        : 'none',
+                                    boxShadow: '0 0 0 2px #00FF9D44',
+                                },
+                                '&:hover::before': {
+                                    content: '""',
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    background: 'linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.00) 100%)',
+                                    pointerEvents: 'none',
+                                    zIndex: 2,
+                                },
+                            }}
                             onClick={() => {
                                 const isSelected = selected.includes(nft.id);
                                 setSelected((prev) =>
