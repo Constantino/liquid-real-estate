@@ -65,7 +65,10 @@ function App() {
                 }}
               >
                 <Typography variant="h1" component="h1" sx={{ mb: 2 }}>
-                  Welcome to Liquid Real Estate
+                  Liquid Real Estate
+                </Typography>
+                <Typography variant="h4" component="h4" sx={{ mb: 2 }}>
+                  Own your piece of real estate with hyper liquidity.
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
                   <Button variant="outlined" color="primary">
