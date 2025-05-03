@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Grid,
@@ -6,6 +6,8 @@ import {
     CardMedia,
     CardContent,
     Typography,
+    Checkbox,
+    FormControlLabel,
 } from '@mui/material';
 
 const mockNFTs = [
@@ -82,12 +84,34 @@ const mockNFTs = [
 ];
 
 const Viewer = () => {
+    const [selected, setSelected] = useState([]);
+
+    const handleSelect = (id) => (event) => {
+        setSelected((prev) =>
+            event.target.checked
+                ? [...prev, id]
+                : prev.filter((selectedId) => selectedId !== id)
+        );
+    };
+
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
             <Grid container spacing={4} justifyContent="center" alignItems="stretch">
                 {mockNFTs.map((nft) => (
                     <Grid item key={nft.id} xs={12} sm={6} md={4} display="flex">
                         <Card sx={{ background: 'rgba(20, 20, 24, 0.95)', display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={selected.includes(nft.id)}
+                                            onChange={handleSelect(nft.id)}
+                                            color="primary"
+                                        />
+                                    }
+                                    label=""
+                                />
+                            </Box>
                             <CardMedia
                                 component="img"
                                 height="180"
