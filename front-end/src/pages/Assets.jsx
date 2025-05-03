@@ -8,6 +8,9 @@ import {
     Typography,
     Checkbox,
     FormControlLabel,
+    Button,
+    Modal,
+    Paper,
 } from '@mui/material';
 
 const mockNFTs = [
@@ -85,6 +88,7 @@ const mockNFTs = [
 
 const Assets = () => {
     const [selected, setSelected] = useState([]);
+    const [open, setOpen] = useState(false);
 
     const handleSelect = (id) => (event) => {
         setSelected((prev) =>
@@ -94,8 +98,16 @@ const Assets = () => {
         );
     };
 
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
     return (
-        <Box sx={{ flexGrow: 1, mt: 6 }}>
+        <Box sx={{ flexGrow: 1, mt: 6, position: 'relative' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                <Button variant="contained" color="primary" onClick={handleOpen}>
+                    Request Loan
+                </Button>
+            </Box>
             <Grid container spacing={4} justifyContent="center" alignItems="stretch">
                 {mockNFTs.map((nft) => (
                     <Grid item key={nft.id} xs={12} sm={6} md={4} display="flex">
@@ -134,6 +146,12 @@ const Assets = () => {
                     </Grid>
                 ))}
             </Grid>
+            <Modal open={open} onClose={handleClose}>
+                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 320 }}>
+                    {/* Modal content goes here */}
+                    <Typography variant="h6">Request Loan</Typography>
+                </Paper>
+            </Modal>
         </Box>
     );
 };
