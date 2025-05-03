@@ -43,10 +43,17 @@ const Realtor = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle mint logic here
-        uploadSimpleFileTestToPinata();
+
+        if (form.picture) {
+            const imageFile = new File([form.picture], form.picture.name, { type: form.picture.type });
+            // You can now use imageFile for upload
+            console.log('Image file ready for upload:', imageFile);
+
+            const upload = await pinata.upload.public.file(imageFile);
+            console.log(upload);
+        }
 
         alert('Minted!');
     };
