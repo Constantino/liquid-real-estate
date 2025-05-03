@@ -54,7 +54,7 @@ const Loans = () => {
             <Grid container spacing={4} justifyContent="center" alignItems="stretch">
                 {mockLoans.map((loan, idx) => (
                     <Grid item key={loan.id} xs={12} sm={6} md={4} display="flex">
-                        <Card sx={{ background: 'rgba(20, 20, 24, 0.95)', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflow: 'hidden' }}>
+                        <Card sx={{ background: 'rgba(20, 20, 24, 0.95)', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflow: 'hidden', cursor: 'pointer', border: 'none', transition: 'box-shadow 0.2s', boxShadow: '0 2px 12px 0 rgba(0,0,0,0.12)', '&:hover': { boxShadow: '0 0 0 2px #00FF9D44' }, '&:hover::before': { content: '""', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.06) 60%, rgba(255,255,255,0.00) 100%)', pointerEvents: 'none', zIndex: 2 } }}>
                             <Stack direction="row" spacing={1} sx={{ p: 1, justifyContent: 'center', alignItems: 'center' }}>
                                 {loan.images.map((img, i) => (
                                     <CardMedia
