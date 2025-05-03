@@ -6,8 +6,6 @@ import {
     CardMedia,
     CardContent,
     Typography,
-    Checkbox,
-    FormControlLabel,
     Button,
     Modal,
     Paper,
@@ -154,16 +152,7 @@ const Assets = () => {
                             }}
                         >
                             <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }} onClick={e => e.stopPropagation()}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={selected.includes(nft.id)}
-                                            onChange={handleSelect(nft.id)}
-                                            color="primary"
-                                        />
-                                    }
-                                    label=""
-                                />
+                                {/* Checkbox removed, selection logic remains */}
                             </Box>
                             <CardMedia
                                 component="img"
