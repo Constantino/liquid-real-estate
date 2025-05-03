@@ -150,7 +150,7 @@ const Assets = () => {
                 ))}
             </Grid>
             <Modal open={open} onClose={handleClose}>
-                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 546, minHeight: 320, display: 'flex', flexDirection: 'column' }}>
+                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 546, minHeight: 320, display: 'flex', flexDirection: 'column', background: 'rgba(30, 30, 40, 0.85)', backdropFilter: 'blur(12px)' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                         <IconButton onClick={handleClose} size="small">
                             <CloseIcon />
