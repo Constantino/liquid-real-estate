@@ -114,8 +114,16 @@ const Assets = () => {
             <Grid container spacing={4} justifyContent="center" alignItems="stretch">
                 {mockNFTs.map((nft) => (
                     <Grid item key={nft.id} xs={12} sm={6} md={4} display="flex">
-                        <Card sx={{ background: 'rgba(20, 20, 24, 0.95)', display: 'flex', flexDirection: 'column', height: '100%' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }}>
+                        <Card
+                            sx={{ background: 'rgba(20, 20, 24, 0.95)', display: 'flex', flexDirection: 'column', height: '100%', cursor: 'pointer', border: selected.includes(nft.id) ? '2px solid #00FF9D' : 'none' }}
+                            onClick={() => {
+                                const isSelected = selected.includes(nft.id);
+                                setSelected((prev) =>
+                                    isSelected ? prev.filter((id) => id !== nft.id) : [...prev, nft.id]
+                                );
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1 }} onClick={e => e.stopPropagation()}>
                                 <FormControlLabel
                                     control={
                                         <Checkbox
