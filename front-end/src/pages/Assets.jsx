@@ -12,6 +12,7 @@ import {
     Modal,
     Paper,
     IconButton,
+    TextField,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -149,7 +150,7 @@ const Assets = () => {
                 ))}
             </Grid>
             <Modal open={open} onClose={handleClose}>
-                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 320, minHeight: 180, display: 'flex', flexDirection: 'column' }}>
+                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 320, minHeight: 320, display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                         <IconButton onClick={handleClose} size="small">
                             <CloseIcon />
@@ -158,6 +159,13 @@ const Assets = () => {
                     <Typography variant="h6" sx={{ mb: 3 }}>
                         Request Loan
                     </Typography>
+                    <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <TextField label="Collateral" name="collateral" fullWidth />
+                        <TextField label="Loan Amount" name="loanAmount" type="number" fullWidth />
+                        <TextField label="Fixed Fee" name="fixedFee" type="number" fullWidth />
+                        <TextField label="Interest" name="interest" type="number" fullWidth />
+                        <TextField label="Time" name="time" fullWidth />
+                    </Box>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                         <Button variant="contained" color="success" size="large">
