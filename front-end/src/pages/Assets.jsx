@@ -11,7 +11,9 @@ import {
     Button,
     Modal,
     Paper,
+    IconButton,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 const mockNFTs = [
     {
@@ -147,9 +149,21 @@ const Assets = () => {
                 ))}
             </Grid>
             <Modal open={open} onClose={handleClose}>
-                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 320 }}>
-                    {/* Modal content goes here */}
-                    <Typography variant="h6">Request Loan</Typography>
+                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 320, minHeight: 180, display: 'flex', flexDirection: 'column' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                        <IconButton onClick={handleClose} size="small">
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    <Typography variant="h6" sx={{ mb: 3 }}>
+                        Request Loan
+                    </Typography>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                        <Button variant="contained" color="success" size="large">
+                            Get loan
+                        </Button>
+                    </Box>
                 </Paper>
             </Modal>
         </Box>
