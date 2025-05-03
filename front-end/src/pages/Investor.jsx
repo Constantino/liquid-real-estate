@@ -11,6 +11,7 @@ import {
     Typography,
     Stack,
     Chip,
+    Button,
 } from '@mui/material';
 
 const mockDisbursals = [
@@ -30,15 +31,25 @@ const poolStats = [
 const Investor = () => {
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
-            <Stack direction="column" spacing={2} sx={{ mb: 3, alignItems: 'flex-start' }}>
-                {poolStats.map((stat) => (
-                    <Chip
-                        key={stat.label}
-                        label={<><b>{stat.label}:</b> {stat.value}</>}
-                        sx={{ fontSize: 16, background: 'rgba(0,255,157,0.08)', color: '#00FF9D', fontWeight: 500 }}
-                    />
-                ))}
-            </Stack>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                <Stack direction="column" spacing={2} alignItems="flex-start">
+                    {poolStats.map((stat) => (
+                        <Chip
+                            key={stat.label}
+                            label={<><b>{stat.label}:</b> {stat.value}</>}
+                            sx={{ fontSize: 16, background: 'rgba(0,255,157,0.08)', color: '#00FF9D', fontWeight: 500 }}
+                        />
+                    ))}
+                </Stack>
+                <Stack direction="column" spacing={2} alignItems="flex-end">
+                    <Button variant="contained" color="success" sx={{ minWidth: 120 }}>
+                        Invest
+                    </Button>
+                    <Button variant="outlined" color="primary" sx={{ minWidth: 120 }}>
+                        Withdraw
+                    </Button>
+                </Stack>
+            </Box>
             <Typography variant="h5" sx={{ mb: 3 }}>
                 Disbursals
             </Typography>
