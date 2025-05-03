@@ -143,11 +143,15 @@ function ResponsiveAppBar() {
                     </Box>
                     <ConnectButton theme={darkTheme({
                         colors: {
-                            primaryButtonBg: 'var(--accent-gradient)',
-                            primaryButtonText: 'var(--text-primary)',
+                            primaryButtonBg: 'rgba(0,255,157,0.08)',
+                            primaryButtonText: '#00FF9D',
                         }
                     })
-                    } client={client} />
+                    }
+                        connectButton={{
+                            label: "Connect Wallet",
+                        }}
+                        client={client} />
                     {/* <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

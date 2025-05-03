@@ -11,9 +11,11 @@ import Market from './pages/Market'
 import Assets from './pages/Assets'
 import Loans from './pages/Loans'
 import Investor from './pages/Investor'
+import { ConnectButton, darkTheme, lightTheme } from "thirdweb/react";
+import { createThirdwebClient } from "thirdweb";
 
 // Create a dark theme
-const darkTheme = createTheme({
+const darkThemeLocal = createTheme({
   palette: {
     mode: 'dark',
     primary: {
@@ -46,13 +48,17 @@ const darkTheme = createTheme({
   },
 })
 
+const client = createThirdwebClient({
+  clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
+});
+
 function App() {
   return (
     <ThirdwebProvider>
 
 
       <Router>
-        <ThemeProvider theme={darkTheme}>
+        <ThemeProvider theme={darkThemeLocal}>
           <CssBaseline />
           <ResponsiveAppBar />
           <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -75,9 +81,17 @@ function App() {
                     Own your piece of real estate with hyper liquidity.
                   </Typography>
                   <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button variant="outlined" color="primary">
-                      Connect Wallet
-                    </Button>
+                    <ConnectButton theme={darkTheme({
+                      colors: {
+                        primaryButtonBg: 'rgba(0,255,157,0.08)',
+                        primaryButtonText: '#00FF9D',
+                      }
+                    })
+                    }
+                      connectButton={{
+                        label: "Connect Wallet",
+                      }}
+                      client={client} />
                   </Box>
                 </Box>
               } />
