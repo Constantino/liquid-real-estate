@@ -34,7 +34,7 @@ function App() {
       <ThemeProvider theme={darkTheme}>
         <CssBaseline />
         <ResponsiveAppBar />
-        <Container maxWidth="lg">
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
           <Routes>
             <Route path="/" element={
               <Box

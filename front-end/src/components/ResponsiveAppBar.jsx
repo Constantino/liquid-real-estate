@@ -49,18 +49,28 @@ function ResponsiveAppBar() {
     };
 
     return (
-        <AppBar position="static">
-            <Container maxWidth="xl">
-                <Toolbar disableGutters>
-                    <Link to="/">
+        <AppBar
+            position="static"
+            sx={{
+                background: 'transparent',
+                backdropFilter: 'blur(8px)',
+                boxShadow: 'none',
+                borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+                width: '100%',
+                maxWidth: '100%'
+            }}
+        >
+            <Container maxWidth={false} sx={{ px: { xs: 2, sm: 4, md: 6 } }}>
+                <Toolbar disableGutters sx={{ width: '100%' }}>
+                    <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
                         <img
                             src={liquidRealEstateLogo}
                             alt="Liquid Real Estate Logo"
-                            style={{ width: '100px', height: '100px' }}
+                            style={{ width: '60px', height: '60px' }}
                         />
                     </Link>
 
-                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+                    <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, justifyContent: 'flex-end' }}>
                         <IconButton
                             size="large"
                             aria-label="account of current user"
@@ -85,7 +95,13 @@ function ResponsiveAppBar() {
                             }}
                             open={Boolean(anchorElNav)}
                             onClose={handleCloseNavMenu}
-                            sx={{ display: { xs: 'block', md: 'none' } }}
+                            sx={{
+                                display: { xs: 'block', md: 'none' },
+                                '& .MuiPaper-root': {
+                                    background: 'rgba(26, 26, 26, 0.8)',
+                                    backdropFilter: 'blur(8px)',
+                                }
+                            }}
                         >
                             {pages.map((page) => (
                                 <MenuItem
@@ -97,17 +113,21 @@ function ResponsiveAppBar() {
                             ))}
                         </Menu>
                     </Box>
-                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                    <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
                         {pages.map((page) => (
                             <Button
                                 key={page.name}
                                 onClick={() => handleNavigation(page.path)}
                                 sx={{
+                                    mx: 1,
                                     my: 2,
                                     color: 'white',
                                     display: 'block',
+                                    fontSize: '1rem',
+                                    textTransform: 'none',
                                     '&:hover': {
-                                        color: '#00FF9D'
+                                        color: '#00FF9D',
+                                        background: 'transparent'
                                     }
                                 }}
                             >
@@ -122,7 +142,13 @@ function ResponsiveAppBar() {
                             </IconButton>
                         </Tooltip>
                         <Menu
-                            sx={{ mt: '45px' }}
+                            sx={{
+                                mt: '45px',
+                                '& .MuiPaper-root': {
+                                    background: 'rgba(26, 26, 26, 0.8)',
+                                    backdropFilter: 'blur(8px)',
+                                }
+                            }}
                             id="menu-appbar"
                             anchorEl={anchorElUser}
                             anchorOrigin={{
