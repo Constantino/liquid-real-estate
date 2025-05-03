@@ -7,8 +7,21 @@ import {
     Stack,
     Paper,
 } from '@mui/material';
+import { PinataSDK } from "pinata";
 
 const Realtor = () => {
+
+    const pinata = new PinataSDK({
+        pinataJwt: import.meta.env.VITE_PINATA_JWT,
+        pinataGateway: import.meta.env.VITE_PINATA_GATEWAY_URL,
+    });
+
+    const uploadSimpleFileTestToPinata = async () => {
+        const file = new File(["hello"], "Testing.txt", { type: "text/plain" });
+        const upload = await pinata.upload.public.file(file);
+        console.log(upload);
+    }
+
     const [form, setForm] = useState({
         name: '',
         description: '',
@@ -33,6 +46,8 @@ const Realtor = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         // Handle mint logic here
+        uploadSimpleFileTestToPinata();
+
         alert('Minted!');
     };
 
