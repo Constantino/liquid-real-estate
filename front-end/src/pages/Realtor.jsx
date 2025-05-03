@@ -46,16 +46,29 @@ const Realtor = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const metadata = {
+            name: form.name,
+            description: form.description,
+            units: form.units,
+        };
+
+        let metadataCid;
         if (form.picture) {
             const imageFile = new File([form.picture], form.picture.name, { type: form.picture.type });
             // You can now use imageFile for upload
             console.log('Image file ready for upload:', imageFile);
 
             const upload = await pinata.upload.public.file(imageFile);
-            console.log(upload);
+            const pictureCid = upload.cid;
+            metadata.picture = import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS + pictureCid;
+
+            const uploadMetadata = await pinata.upload.public.json(metadata)
+            metadataCid = uploadMetadata.cid;
+
+            console.log("full metadata: ", import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS + metadataCid);
         }
 
-        alert('Minted!');
+
     };
 
     return (
