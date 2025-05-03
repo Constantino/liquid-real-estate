@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     Table,
@@ -12,7 +12,11 @@ import {
     Stack,
     Chip,
     Button,
+    Modal,
+    TextField,
+    IconButton,
 } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 const mockDisbursals = [
     { id: 'DSB-001', date: '2024-06-01', amount: '1.5 ETH' },
@@ -29,6 +33,16 @@ const poolStats = [
 ];
 
 const Investor = () => {
+    const [open, setOpen] = useState(false);
+    const [amount, setAmount] = useState('');
+    const [openWithdraw, setOpenWithdraw] = useState(false);
+    const [withdrawAmount, setWithdrawAmount] = useState('');
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+    const handleOpenWithdraw = () => setOpenWithdraw(true);
+    const handleCloseWithdraw = () => setOpenWithdraw(false);
+
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
@@ -42,14 +56,68 @@ const Investor = () => {
                     ))}
                 </Stack>
                 <Stack direction="column" spacing={2} alignItems="flex-end">
-                    <Button variant="contained" color="success" sx={{ minWidth: 120 }}>
+                    <Button variant="contained" color="success" sx={{ minWidth: 120 }} onClick={handleOpen}>
                         Invest
                     </Button>
-                    <Button variant="outlined" color="primary" sx={{ minWidth: 120 }}>
+                    <Button variant="outlined" color="primary" sx={{ minWidth: 120 }} onClick={handleOpenWithdraw}>
                         Withdraw
                     </Button>
                 </Stack>
             </Box>
+            <Modal open={open} onClose={handleClose}>
+                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 546, minHeight: 320, display: 'flex', flexDirection: 'column', background: 'rgba(30, 30, 40, 0.5)', backdropFilter: 'blur(10px)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                        <IconButton onClick={handleClose} size="small">
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    <Typography variant="h6" sx={{ mb: 3 }}>
+                        Invest
+                    </Typography>
+                    <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <TextField
+                            label="Amount"
+                            type="number"
+                            value={amount}
+                            onChange={e => setAmount(e.target.value)}
+                            fullWidth
+                        />
+                    </Box>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                        <Button variant="contained" color="success" size="large">
+                            Invest
+                        </Button>
+                    </Box>
+                </Paper>
+            </Modal>
+            <Modal open={openWithdraw} onClose={handleCloseWithdraw}>
+                <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 546, minHeight: 320, display: 'flex', flexDirection: 'column', background: 'rgba(30, 30, 40, 0.5)', backdropFilter: 'blur(10px)' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                        <IconButton onClick={handleCloseWithdraw} size="small">
+                            <CloseIcon />
+                        </IconButton>
+                    </Box>
+                    <Typography variant="h6" sx={{ mb: 3 }}>
+                        Withdraw
+                    </Typography>
+                    <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <TextField
+                            label="Amount"
+                            type="number"
+                            value={withdrawAmount}
+                            onChange={e => setWithdrawAmount(e.target.value)}
+                            fullWidth
+                        />
+                    </Box>
+                    <Box sx={{ flexGrow: 1 }} />
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                        <Button variant="contained" color="primary" size="large">
+                            Withdraw
+                        </Button>
+                    </Box>
+                </Paper>
+            </Modal>
             <Typography variant="h5" sx={{ mb: 3 }}>
                 Disbursals
             </Typography>
