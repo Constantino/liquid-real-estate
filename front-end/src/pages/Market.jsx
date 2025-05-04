@@ -8,6 +8,7 @@ import {
     CardActions,
     Typography,
     Button,
+    TextField,
 } from '@mui/material';
 
 const mockNFTs = [
@@ -131,11 +132,38 @@ const Market = () => {
                                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                     {nft.description}
                                 </Typography>
-                                <Typography variant="subtitle1" color="primary">
-                                    {nft.price}
-                                </Typography>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                    <Typography variant="subtitle1" color="primary">
+                                        {nft.price}
+                                    </Typography>
+                                    <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
+                                        Supply: {nft.supply || 100}
+                                    </Typography>
+                                </Box>
                             </CardContent>
-                            <CardActions>
+                            <CardActions sx={{ flexDirection: 'column', gap: 1, p: 2 }}>
+                                <TextField
+                                    type="number"
+                                    label="Amount"
+                                    variant="outlined"
+                                    size="small"
+                                    fullWidth
+                                    InputProps={{
+                                        inputProps: { min: 1 },
+                                        sx: {
+                                            color: '#00FF9D',
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#00FF9D',
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: '#00FF9D',
+                                            },
+                                        }
+                                    }}
+                                    InputLabelProps={{
+                                        sx: { color: '#00FF9D' }
+                                    }}
+                                />
                                 <Button variant="contained" color="success" fullWidth>
                                     Buy
                                 </Button>
