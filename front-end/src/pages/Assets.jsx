@@ -304,7 +304,10 @@ const Assets = () => {
                                         Owned: {nft.balance}
                                     </Typography>
                                     <Typography variant="subtitle1" color="primary" sx={{ mt: 1 }}>
-                                        Listed Price: {nft.listedPrice} MNT
+                                        Price: {nft.listedPrice} MNT
+                                    </Typography>
+                                    <Typography variant="subtitle1" color="primary" sx={{ mt: 1 }}>
+                                        Investment: {nft.listedPrice === 'Not Listed' ? '0' : (parseFloat(nft.balance) * parseFloat(nft.listedPrice)).toFixed(4)} MNT
                                     </Typography>
                                 </Box>
                             </CardContent>
