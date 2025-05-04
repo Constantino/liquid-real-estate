@@ -22,6 +22,7 @@ import EscrowABI from '../assets/contracts/Escrow.abi.json';
 const MANTLE_SEPOLIA_RPC = 'https://rpc.sepolia.mantle.xyz';
 const CONTRACT_ADDRESS = import.meta.env.VITE_REAL_ESTATE_TOKEN_ADDRESS;
 const ESCROW_ADDRESS = import.meta.env.VITE_ESCROW_ADDRESS;
+const INTEREST_RATE = 10; // 10% interest rate
 
 const Assets = () => {
     const [ownedNFTs, setOwnedNFTs] = useState([]);
@@ -337,8 +338,9 @@ const Assets = () => {
                             }, 0).toFixed(4)} MNT
                         </Typography>
                         <TextField label="Loan Amount" name="loanAmount" type="number" fullWidth />
-                        <TextField label="Fixed Fee" name="fixedFee" type="number" fullWidth />
-                        <TextField label="Interest" name="interest" type="number" fullWidth />
+                        <Typography variant="subtitle1" color="primary">
+                            Interest: {INTEREST_RATE}% annually
+                        </Typography>
                         <TextField label="Time" name="time" fullWidth />
                     </Box>
                     <Box sx={{ flexGrow: 1 }} />
