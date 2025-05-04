@@ -99,6 +99,36 @@ const Assets = () => {
         return totalPayment.toFixed(18);
     };
 
+    const handleGetLoan = () => {
+        // Get existing loan requests from localStorage
+        const existingLoans = JSON.parse(localStorage.getItem('loanRequests') || '[]');
+
+        // Create new loan data with ID
+        const loanData = {
+            id: existingLoans.length, // Use array length as next ID
+            selectedNFTs: selected,
+            loanAmount,
+            time,
+            collateralValue: calculateCollateralValue(),
+            totalPayment: calculateTotalPayment(),
+            interestRate: INTEREST_RATE,
+            timestamp: new Date().toISOString()
+        };
+
+        // Add new loan to array
+        const updatedLoans = [...existingLoans, loanData];
+
+        // Store updated array in localStorage
+        localStorage.setItem('loanRequests', JSON.stringify(updatedLoans));
+
+        // Log to console
+        console.log('Loan Request Data:', loanData);
+        console.log('All Loan Requests:', updatedLoans);
+
+        // Close modal
+        handleClose();
+    };
+
     const connectWallet = async () => {
         try {
             setIsConnecting(true);
@@ -409,6 +439,7 @@ const Assets = () => {
                             color="success"
                             size="large"
                             disabled={!!loanError || !!timeError}
+                            onClick={handleGetLoan}
                         >
                             Get loan
                         </Button>
