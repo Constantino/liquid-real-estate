@@ -15,8 +15,19 @@ import {
     Modal,
     TextField,
     IconButton,
+    Alert,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { ethers } from 'ethers';
+import LiquidityPoolABI from '../assets/contracts/LiquidityPool.abi.json';
+
+const LIQUIDITY_POOL_ADDRESS = import.meta.env.VITE_LIQUIDITY_POOL_ADDRESS;
+const MXNB_ADDRESS = import.meta.env.VITE_MXNB_ADDRESS;
+
+const ERC20_ABI = [
+    "function approve(address spender, uint256 amount) public returns (bool)",
+    "function allowance(address owner, address spender) public view returns (uint256)"
+];
 
 const mockDisbursals = [
     { id: 'DSB-001', date: '2024-06-01', amount: '1.5 ETH' },
@@ -37,11 +48,67 @@ const Investor = () => {
     const [amount, setAmount] = useState('');
     const [openWithdraw, setOpenWithdraw] = useState(false);
     const [withdrawAmount, setWithdrawAmount] = useState('');
+    const [error, setError] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+        setError(null);
+    };
     const handleOpenWithdraw = () => setOpenWithdraw(true);
     const handleCloseWithdraw = () => setOpenWithdraw(false);
+
+    const handleInvest = async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+
+            if (!window.ethereum) {
+                throw new Error('Please install MetaMask!');
+            }
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const address = await signer.getAddress();
+
+            // Get MXNB token contract with simplified ABI
+            const mxnbContract = new ethers.Contract(MXNB_ADDRESS, ERC20_ABI, signer);
+
+            // Check current allowance
+            const currentAllowance = await mxnbContract.allowance(address, LIQUIDITY_POOL_ADDRESS);
+            const requiredAllowance = 5000000000
+
+            // Only approve if current allowance is less than required
+            if (currentAllowance.lt(requiredAllowance)) {
+                const approveTx = await mxnbContract.approve(
+                    LIQUIDITY_POOL_ADDRESS,
+                    requiredAllowance
+                );
+                await approveTx.wait();
+            }
+
+            // Get LiquidityPool contract
+            const liquidityPoolContract = new ethers.Contract(
+                LIQUIDITY_POOL_ADDRESS,
+                LiquidityPoolABI,
+                signer
+            );
+
+            // Call invest function
+            const investTx = await liquidityPoolContract.invest(
+                ethers.utils.parseUnits(amount, 6)
+            );
+            await investTx.wait();
+
+            handleClose();
+        } catch (error) {
+            console.error('Error investing:', error);
+            setError(error.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
@@ -64,6 +131,13 @@ const Investor = () => {
                     </Button>
                 </Stack>
             </Box>
+
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
+
             <Modal open={open} onClose={handleClose}>
                 <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 546, minHeight: 320, display: 'flex', flexDirection: 'column', background: 'rgba(30, 30, 40, 0.5)', backdropFilter: 'blur(10px)' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
@@ -81,12 +155,19 @@ const Investor = () => {
                             value={amount}
                             onChange={e => setAmount(e.target.value)}
                             fullWidth
+                            disabled={isLoading}
                         />
                     </Box>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                        <Button variant="contained" color="success" size="large">
-                            Invest
+                        <Button
+                            variant="contained"
+                            color="success"
+                            size="large"
+                            onClick={handleInvest}
+                            disabled={isLoading || !amount}
+                        >
+                            {isLoading ? 'Processing...' : 'Invest'}
                         </Button>
                     </Box>
                 </Paper>
