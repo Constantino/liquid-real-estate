@@ -18,11 +18,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { ethers } from 'ethers';
 import RealEstateTokenABI from '../assets/contracts/RealEstateToken.abi.json';
 import EscrowABI from '../assets/contracts/Escrow.abi.json';
+import LoanHandlerABI from '../assets/contracts/LoanHandler.abi.json';
 
 const MANTLE_SEPOLIA_RPC = 'https://rpc.sepolia.mantle.xyz';
 const CONTRACT_ADDRESS = import.meta.env.VITE_REAL_ESTATE_TOKEN_ADDRESS;
 const ESCROW_ADDRESS = import.meta.env.VITE_ESCROW_ADDRESS;
 const INTEREST_RATE = 10; // 10% interest rate
+const LOAN_HANDLER_ADDRESS = import.meta.env.VITE_LOAN_HANDLER_ADDRESS;
 
 const Assets = () => {
     const [ownedNFTs, setOwnedNFTs] = useState([]);
@@ -99,34 +101,67 @@ const Assets = () => {
         return totalPayment.toFixed(18);
     };
 
-    const handleGetLoan = () => {
-        // Get existing loan requests from localStorage
-        const existingLoans = JSON.parse(localStorage.getItem('loanRequests') || '[]');
+    const handleGetLoan = async () => {
+        try {
+            // Get existing loan requests from localStorage
+            const existingLoans = JSON.parse(localStorage.getItem('loanRequests') || '[]');
 
-        // Create new loan data with ID
-        const loanData = {
-            id: existingLoans.length, // Use array length as next ID
-            selectedNFTs: selected,
-            loanAmount,
-            time,
-            collateralValue: calculateCollateralValue(),
-            totalPayment: calculateTotalPayment(),
-            interestRate: INTEREST_RATE,
-            timestamp: new Date().toISOString()
-        };
+            // Create new loan data with ID
+            const loanData = {
+                id: existingLoans.length, // Use array length as next ID
+                selectedNFTs: selected,
+                loanAmount,
+                time,
+                collateralValue: calculateCollateralValue(),
+                totalPayment: calculateTotalPayment(),
+                interestRate: INTEREST_RATE,
+                timestamp: new Date().toISOString()
+            };
 
-        // Add new loan to array
-        const updatedLoans = [...existingLoans, loanData];
+            // Call loan handler contract
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const loanHandlerContract = new ethers.Contract(LOAN_HANDLER_ADDRESS, LoanHandlerABI, signer);
 
-        // Store updated array in localStorage
-        localStorage.setItem('loanRequests', JSON.stringify(updatedLoans));
+            // Convert values to wei
+            const loanAmountInWei = ethers.utils.parseEther(loanAmount.toString());
+            const collateralValueInWei = ethers.utils.parseEther(calculateCollateralValue().toString());
+            const totalPaymentInWei = ethers.utils.parseEther(calculateTotalPayment());
 
-        // Log to console
-        console.log('Loan Request Data:', loanData);
-        console.log('All Loan Requests:', updatedLoans);
+            // Call requestLoan with correct parameters
+            const tx = await loanHandlerContract.requestLoan(
+                collateralValueInWei, // collateralValue
+                INTEREST_RATE, // interestRate
+                loanAmountInWei, // loanAmount
+                time, // time
+                totalPaymentInWei // totalPayment
+            );
 
-        // Close modal
-        handleClose();
+            // Wait for transaction to be mined
+            const receipt = await tx.wait();
+
+            // Get loanId from event
+            const loanId = receipt.events.find(event => event.event === 'LoanRequested').args.loanId;
+
+            // Add loanId to loanData
+            loanData.loanId = loanId.toString();
+
+            // Add new loan to array
+            const updatedLoans = [...existingLoans, loanData];
+
+            // Store updated array in localStorage
+            localStorage.setItem('loanRequests', JSON.stringify(updatedLoans));
+
+            // Log to console
+            console.log('Loan Request Data:', loanData);
+            console.log('All Loan Requests:', updatedLoans);
+
+            // Close modal
+            handleClose();
+        } catch (error) {
+            console.error('Error requesting loan:', error);
+            setError('Failed to request loan: ' + error.message);
+        }
     };
 
     const connectWallet = async () => {
