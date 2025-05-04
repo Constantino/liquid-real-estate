@@ -233,9 +233,14 @@ const Market = () => {
                                     <Typography variant="subtitle1" color="primary">
                                         {nft.metadata.price || '0 MNT'}
                                     </Typography>
-                                    <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
-                                        Supply: {nft.metadata.units || 0}
-                                    </Typography>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                        <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
+                                            Total Supply: {nft.metadata.units || 0}
+                                        </Typography>
+                                        <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
+                                            Available: {nft.balance}
+                                        </Typography>
+                                    </Box>
                                 </Box>
                             </CardContent>
                             <CardActions sx={{ flexDirection: 'column', gap: 1, p: 2 }}>
