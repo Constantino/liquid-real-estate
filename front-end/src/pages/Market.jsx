@@ -244,14 +244,6 @@ const Market = () => {
 
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
-            {!account && (
-                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
-                    <Button variant="contained" color="primary" onClick={connectWallet}>
-                        Connect Wallet
-                    </Button>
-                </Box>
-            )}
-
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}
