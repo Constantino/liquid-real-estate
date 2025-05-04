@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Grid,
@@ -91,6 +91,8 @@ const mockNFTs = [
 ];
 
 const Market = () => {
+    const [ownedNFTs, setOwnedNFTs] = useState([]);
+
     const readNFTs = async () => {
         try {
             const provider = new ethers.providers.JsonRpcProvider(MANTLE_SEPOLIA_RPC);
@@ -106,20 +108,63 @@ const Market = () => {
             const ownedTokens = [];
             for (let i = 0; i < tokenIds.length; i++) {
                 if (tokenIds[i].gt(0)) {
-                    const uri = await contract.uri(i);
-                    ownedTokens.push({
-                        tokenId: i,
-                        balance: tokenIds[i].toString(),
-                        uri: uri
-                    });
+                    try {
+                        const uri = await contract.uri(i);
+                        console.log('Original URI:', uri);
+
+                        // Process the URI
+                        let processedUri = uri;
+                        if (uri.includes('ipfs://')) {
+                            processedUri = uri.replace('ipfs://', import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS);
+                        } else if (uri.includes('https://ipfs.io/ipfs/')) {
+                            processedUri = uri.replace('https://ipfs.io/ipfs/', import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS);
+                        }
+
+                        processedUri += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
+                        console.log('Processed URI:', processedUri);
+
+                        // Fetch the metadata
+                        const response = await fetch(processedUri);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const metadata = await response.json();
+
+                        // Add https:// prefix to picture URL if needed
+                        if (metadata.picture && !metadata.picture.startsWith('http')) {
+                            metadata.picture = 'https://' + metadata.picture;
+                        }
+
+                        // Add Pinata gateway token to picture URL
+                        if (metadata.picture) {
+                            metadata.picture += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
+                        }
+
+                        ownedTokens.push({
+                            tokenId: i,
+                            balance: tokenIds[i].toString(),
+                            uri: processedUri,
+                            metadata: metadata
+                        });
+                    } catch (error) {
+                        console.error(`Error processing token ${i}:`, error);
+                        // Continue with next token even if one fails
+                        continue;
+                    }
                 }
             }
 
             console.log('Owned NFTs:', ownedTokens);
+            setOwnedNFTs(ownedTokens);
         } catch (error) {
             console.error('Error reading NFTs:', error);
         }
     };
+
+    // Read NFTs when component mounts
+    useEffect(() => {
+        readNFTs();
+    }, []);
 
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
@@ -140,8 +185,8 @@ const Market = () => {
                 </Button>
             </Box>
             <Grid container spacing={4} justifyContent="center" alignItems="stretch">
-                {mockNFTs.map((nft) => (
-                    <Grid item key={nft.id} xs={12} sm={6} md={4} display="flex">
+                {ownedNFTs.map((nft) => (
+                    <Grid item key={nft.tokenId} xs={12} sm={6} md={4} display="flex">
                         <Card
                             sx={{
                                 background: 'rgba(20, 20, 24, 0.95)',
@@ -173,23 +218,23 @@ const Market = () => {
                             <CardMedia
                                 component="img"
                                 height="180"
-                                image={nft.image}
-                                alt={nft.name}
+                                image={nft.metadata.picture}
+                                alt={nft.metadata.name}
                                 sx={{ objectFit: 'cover' }}
                             />
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography gutterBottom variant="h6" component="div">
-                                    {nft.name}
+                                    {nft.metadata.name}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                    {nft.description}
+                                    {nft.metadata.description}
                                 </Typography>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                     <Typography variant="subtitle1" color="primary">
-                                        {nft.price}
+                                        {nft.metadata.price || '0 MNT'}
                                     </Typography>
                                     <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
-                                        Supply: {nft.supply || 100}
+                                        Supply: {nft.metadata.units || 0}
                                     </Typography>
                                 </Box>
                             </CardContent>
