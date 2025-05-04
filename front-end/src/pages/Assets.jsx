@@ -31,6 +31,8 @@ const Assets = () => {
     const [isConnecting, setIsConnecting] = useState(false);
     const [selected, setSelected] = useState([]);
     const [open, setOpen] = useState(false);
+    const [loanAmount, setLoanAmount] = useState(0);
+    const [time, setTime] = useState(0);
 
     const handleSelect = (id) => (event) => {
         setSelected((prev) =>
@@ -52,6 +54,20 @@ const Assets = () => {
     const handleClose = () => {
         setOpen(false);
         setError(null);
+    };
+
+    const handleLoanAmountChange = (event) => {
+        setLoanAmount(parseFloat(event.target.value) || 0);
+    };
+
+    const handleTimeChange = (event) => {
+        setTime(parseFloat(event.target.value) || 0);
+    };
+
+    const calculateTotalPayment = () => {
+        const interestAmount = (loanAmount * INTEREST_RATE / 12 * time) / 100;
+        const totalPayment = loanAmount + interestAmount;
+        return totalPayment.toFixed(4);
     };
 
     const connectWallet = async () => {
@@ -337,11 +353,26 @@ const Assets = () => {
                                 return sum;
                             }, 0).toFixed(4)} MNT
                         </Typography>
-                        <TextField label="Loan Amount" name="loanAmount" type="number" fullWidth />
+                        <TextField
+                            label="Loan Amount"
+                            name="loanAmount"
+                            type="number"
+                            fullWidth
+                            onChange={handleLoanAmountChange}
+                        />
                         <Typography variant="subtitle1" color="primary">
                             Interest: {INTEREST_RATE}% annually
                         </Typography>
-                        <TextField label="Time (months)" name="time" type="number" fullWidth />
+                        <TextField
+                            label="Time (months)"
+                            name="time"
+                            type="number"
+                            fullWidth
+                            onChange={handleTimeChange}
+                        />
+                        <Typography variant="subtitle1" color="primary">
+                            You will pay: {calculateTotalPayment()} MNT
+                        </Typography>
                     </Box>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
