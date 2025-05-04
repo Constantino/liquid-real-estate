@@ -327,7 +327,15 @@ const Assets = () => {
                         Request Loan
                     </Typography>
                     <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <TextField label="Collateral" name="collateral" fullWidth />
+                        <Typography variant="subtitle1" color="primary">
+                            Collateral value: {selected.reduce((sum, tokenId) => {
+                                const nft = ownedNFTs.find(n => n.tokenId === tokenId);
+                                if (nft && nft.listedPrice !== 'Not Listed') {
+                                    return sum + (parseFloat(nft.balance) * parseFloat(nft.listedPrice));
+                                }
+                                return sum;
+                            }, 0).toFixed(4)} MNT
+                        </Typography>
                         <TextField label="Loan Amount" name="loanAmount" type="number" fullWidth />
                         <TextField label="Fixed Fee" name="fixedFee" type="number" fullWidth />
                         <TextField label="Interest" name="interest" type="number" fullWidth />
