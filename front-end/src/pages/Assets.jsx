@@ -34,6 +34,7 @@ const Assets = () => {
     const [loanAmount, setLoanAmount] = useState(0);
     const [time, setTime] = useState(0);
     const [loanError, setLoanError] = useState(null);
+    const [timeError, setTimeError] = useState(null);
 
     const handleSelect = (id) => (event) => {
         setSelected((prev) =>
@@ -81,7 +82,15 @@ const Assets = () => {
     };
 
     const handleTimeChange = (event) => {
-        setTime(parseFloat(event.target.value) || 0);
+        const newTime = parseFloat(event.target.value) || 0;
+
+        if (newTime > 12) {
+            setTimeError('Time cannot exceed 12 months');
+        } else {
+            setTimeError(null);
+        }
+
+        setTime(newTime);
     };
 
     const calculateTotalPayment = () => {
@@ -385,6 +394,9 @@ const Assets = () => {
                             type="number"
                             fullWidth
                             onChange={handleTimeChange}
+                            error={!!timeError}
+                            helperText={timeError}
+                            inputProps={{ max: 12 }}
                         />
                         <Typography variant="subtitle1" color="primary">
                             You will pay: {calculateTotalPayment()} MNT
@@ -396,7 +408,7 @@ const Assets = () => {
                             variant="contained"
                             color="success"
                             size="large"
-                            disabled={!!loanError}
+                            disabled={!!loanError || !!timeError}
                         >
                             Get loan
                         </Button>
