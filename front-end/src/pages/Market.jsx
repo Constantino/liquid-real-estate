@@ -168,22 +168,6 @@ const Market = () => {
 
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
-            <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-                <Button
-                    variant="outlined"
-                    onClick={readNFTs}
-                    sx={{
-                        color: '#00FF9D',
-                        borderColor: '#00FF9D',
-                        '&:hover': {
-                            borderColor: '#00FF9D',
-                            backgroundColor: 'rgba(0, 255, 157, 0.08)',
-                        }
-                    }}
-                >
-                    Read NFTs
-                </Button>
-            </Box>
             <Grid container spacing={4} justifyContent="center" alignItems="stretch">
                 {ownedNFTs.map((nft) => (
                     <Grid item key={nft.tokenId} xs={12} sm={6} md={4} display="flex">
