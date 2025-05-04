@@ -1,93 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Grid,
     Card,
     CardMedia,
     CardContent,
+    CardActions,
     Typography,
     Button,
+    Alert,
     Modal,
     Paper,
     IconButton,
     TextField,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { ethers } from 'ethers';
+import RealEstateTokenABI from '../assets/contracts/RealEstateToken.abi.json';
 
-const mockNFTs = [
-    {
-        id: 1,
-        name: 'Ocean View Condo',
-        description: 'A beautiful condo with a view of the ocean.',
-        price: '2.5 ETH',
-        image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 2,
-        name: 'Downtown Loft',
-        description: 'Modern loft in the heart of downtown.',
-        price: '1.8 ETH',
-        image: 'https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 3,
-        name: 'Country House',
-        description: 'Spacious house in the countryside.',
-        price: '3.2 ETH',
-        image: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 4,
-        name: 'Mountain Cabin',
-        description: 'Cozy cabin with mountain views.',
-        price: '2.1 ETH',
-        image: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 5,
-        name: 'City Apartment',
-        description: 'Modern apartment in the city center.',
-        price: '2.8 ETH',
-        image: 'https://images.unsplash.com/photo-1468436139062-f60a71c5c892?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 6,
-        name: 'Lake House',
-        description: 'Peaceful house by the lake.',
-        price: '3.5 ETH',
-        image: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 7,
-        name: 'Desert Villa',
-        description: 'Luxury villa in the desert.',
-        price: '4.0 ETH',
-        image: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 8,
-        name: 'Forest Retreat',
-        description: 'Retreat in the heart of the forest.',
-        price: '2.3 ETH',
-        image: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 9,
-        name: 'Beach Bungalow',
-        description: 'Bungalow right on the beach.',
-        price: '3.8 ETH',
-        image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80',
-    },
-    {
-        id: 10,
-        name: 'Penthouse Suite',
-        description: 'Exclusive penthouse with city views.',
-        price: '5.0 ETH',
-        image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=400&q=80',
-    },
-];
+const MANTLE_SEPOLIA_RPC = 'https://rpc.sepolia.mantle.xyz';
+const CONTRACT_ADDRESS = import.meta.env.VITE_REAL_ESTATE_TOKEN_ADDRESS;
 
 const Assets = () => {
+    const [ownedNFTs, setOwnedNFTs] = useState([]);
+    const [account, setAccount] = useState(null);
+    const [error, setError] = useState(null);
+    const [isConnecting, setIsConnecting] = useState(false);
     const [selected, setSelected] = useState([]);
     const [open, setOpen] = useState(false);
 
@@ -102,16 +40,181 @@ const Assets = () => {
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
+    const connectWallet = async () => {
+        try {
+            setIsConnecting(true);
+            setError(null);
+
+            if (!window.ethereum) {
+                throw new Error('Please install MetaMask!');
+            }
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const accounts = await provider.send("eth_requestAccounts", []);
+
+            if (accounts.length === 0) {
+                throw new Error('No accounts found. Please connect your wallet.');
+            }
+
+            setAccount(accounts[0]);
+            // Read NFTs after connecting wallet
+            await readNFTs(accounts[0]);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setIsConnecting(false);
+        }
+    };
+
+    const readNFTs = async (walletAddress) => {
+        try {
+            const provider = new ethers.providers.JsonRpcProvider(MANTLE_SEPOLIA_RPC);
+            const tokenContract = new ethers.Contract(CONTRACT_ADDRESS, RealEstateTokenABI, provider);
+
+            // Get all token IDs
+            const tokenIds = await tokenContract.balanceOfBatch(
+                Array(100).fill(walletAddress), // Assuming max 100 different token IDs
+                Array(100).fill().map((_, i) => i) // Start from 0
+            );
+
+            // Filter out tokens with balance > 0
+            const ownedTokens = [];
+            for (let i = 0; i < tokenIds.length; i++) {
+                if (tokenIds[i].gt(0)) {
+                    try {
+                        const uri = await tokenContract.uri(i);
+                        console.log('Original URI:', uri);
+
+                        // Process the URI
+                        let processedUri = uri;
+
+                        // Remove ipfs.io suffix if present
+                        if (processedUri.includes('https://ipfs.io/ipfs/')) {
+                            processedUri = processedUri.replace('https://ipfs.io/ipfs/', '');
+                        }
+
+                        // Only add the token if it's not already in the URL
+                        if (!processedUri.includes('pinataGatewayToken')) {
+                            processedUri += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
+                        }
+
+                        console.log('Processed URI:', processedUri);
+
+                        // Fetch the metadata
+                        const response = await fetch(processedUri);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const metadata = await response.json();
+
+                        // Add https:// prefix to picture URL if needed
+                        if (metadata.picture && !metadata.picture.startsWith('http')) {
+                            metadata.picture = 'https://' + metadata.picture;
+                        }
+
+                        // Add Pinata gateway token to picture URL
+                        if (metadata.picture) {
+                            metadata.picture += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
+                        }
+
+                        ownedTokens.push({
+                            tokenId: i,
+                            balance: tokenIds[i].toString(),
+                            uri: processedUri,
+                            metadata: metadata
+                        });
+                    } catch (error) {
+                        console.error(`Error processing token ${i}:`, error);
+                        // Continue with next token even if one fails
+                        continue;
+                    }
+                }
+            }
+
+            console.log('Owned NFTs:', ownedTokens);
+            setOwnedNFTs(ownedTokens);
+        } catch (error) {
+            console.error('Error reading NFTs:', error);
+            setError('Failed to read NFTs: ' + error.message);
+        }
+    };
+
+    // Check if wallet is already connected when component mounts
+    useEffect(() => {
+        const checkWalletConnection = async () => {
+            if (window.ethereum) {
+                try {
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    const accounts = await provider.listAccounts();
+                    if (accounts.length > 0) {
+                        setAccount(accounts[0]);
+                        await readNFTs(accounts[0]);
+                    }
+                } catch (error) {
+                    console.error('Error checking wallet connection:', error);
+                }
+            }
+        };
+
+        checkWalletConnection();
+    }, []);
+
+    // Listen for account changes
+    useEffect(() => {
+        if (window.ethereum) {
+            const handleAccountsChanged = async (accounts) => {
+                if (accounts.length > 0) {
+                    setAccount(accounts[0]);
+                    await readNFTs(accounts[0]);
+                } else {
+                    setAccount(null);
+                    setOwnedNFTs([]);
+                }
+            };
+
+            window.ethereum.on('accountsChanged', handleAccountsChanged);
+            return () => {
+                window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+            };
+        }
+    }, []);
+
     return (
         <Box sx={{ flexGrow: 1, mt: 6, position: 'relative' }}>
+            {!account && (
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={connectWallet}
+                        disabled={isConnecting}
+                    >
+                        {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                    </Button>
+                </Box>
+            )}
+
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
+
+            {account && ownedNFTs.length === 0 && (
+                <Alert severity="info" sx={{ mb: 2 }}>
+                    No NFTs found in your wallet.
+                </Alert>
+            )}
+
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                 <Button variant="contained" color="primary" onClick={handleOpen}>
                     Request Loan
                 </Button>
             </Box>
+
             <Grid container spacing={4} justifyContent="center" alignItems="stretch">
-                {mockNFTs.map((nft) => (
-                    <Grid item key={nft.id} xs={12} sm={6} md={4} display="flex">
+                {ownedNFTs.map((nft) => (
+                    <Grid item key={nft.tokenId} xs={12} sm={6} md={4} display="flex">
                         <Card
                             sx={{
                                 background: 'rgba(20, 20, 24, 0.95)',
@@ -119,15 +222,15 @@ const Assets = () => {
                                 flexDirection: 'column',
                                 height: '100%',
                                 cursor: 'pointer',
-                                border: selected.includes(nft.id) ? '2px solid #00FF9D' : 'none',
+                                border: selected.includes(nft.tokenId) ? '2px solid #00FF9D' : 'none',
                                 transition: 'box-shadow 0.2s, border-color 0.2s',
-                                boxShadow: selected.includes(nft.id)
+                                boxShadow: selected.includes(nft.tokenId)
                                     ? '0 0 0 2px #00FF9D'
                                     : '0 2px 12px 0 rgba(0,0,0,0.12)',
                                 position: 'relative',
                                 overflow: 'hidden',
                                 '&:hover': {
-                                    border: selected.includes(nft.id)
+                                    border: selected.includes(nft.tokenId)
                                         ? '2px solid #00FF9D'
                                         : 'none',
                                     boxShadow: '0 0 0 2px #00FF9D44',
@@ -145,9 +248,9 @@ const Assets = () => {
                                 },
                             }}
                             onClick={() => {
-                                const isSelected = selected.includes(nft.id);
+                                const isSelected = selected.includes(nft.tokenId);
                                 setSelected((prev) =>
-                                    isSelected ? prev.filter((id) => id !== nft.id) : [...prev, nft.id]
+                                    isSelected ? prev.filter((id) => id !== nft.tokenId) : [...prev, nft.tokenId]
                                 );
                             }}
                         >
@@ -157,25 +260,31 @@ const Assets = () => {
                             <CardMedia
                                 component="img"
                                 height="180"
-                                image={nft.image}
-                                alt={nft.name}
+                                image={nft.metadata.picture}
+                                alt={nft.metadata.name}
                                 sx={{ objectFit: 'cover' }}
                             />
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography gutterBottom variant="h6" component="div">
-                                    {nft.name}
+                                    {nft.metadata.name}
                                 </Typography>
                                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                    {nft.description}
+                                    {nft.metadata.description}
                                 </Typography>
-                                <Typography variant="subtitle1" color="primary">
-                                    {nft.price}
-                                </Typography>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                    <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
+                                        Total Supply: {nft.metadata.units || 0}
+                                    </Typography>
+                                    <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
+                                        Owned: {nft.balance}
+                                    </Typography>
+                                </Box>
                             </CardContent>
                         </Card>
                     </Grid>
                 ))}
             </Grid>
+
             <Modal open={open} onClose={handleClose}>
                 <Paper sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', p: 4, minWidth: 546, minHeight: 320, display: 'flex', flexDirection: 'column', background: 'rgba(30, 30, 40, 0.85)', backdropFilter: 'blur(12px)' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
