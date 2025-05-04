@@ -17,9 +17,11 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { ethers } from 'ethers';
 import RealEstateTokenABI from '../assets/contracts/RealEstateToken.abi.json';
+import EscrowABI from '../assets/contracts/Escrow.abi.json';
 
 const MANTLE_SEPOLIA_RPC = 'https://rpc.sepolia.mantle.xyz';
 const CONTRACT_ADDRESS = import.meta.env.VITE_REAL_ESTATE_TOKEN_ADDRESS;
+const ESCROW_ADDRESS = import.meta.env.VITE_ESCROW_ADDRESS;
 
 const Assets = () => {
     const [ownedNFTs, setOwnedNFTs] = useState([]);
@@ -70,6 +72,7 @@ const Assets = () => {
         try {
             const provider = new ethers.providers.JsonRpcProvider(MANTLE_SEPOLIA_RPC);
             const tokenContract = new ethers.Contract(CONTRACT_ADDRESS, RealEstateTokenABI, provider);
+            const escrowContract = new ethers.Contract(ESCROW_ADDRESS, EscrowABI, provider);
 
             // Get all token IDs
             const tokenIds = await tokenContract.balanceOfBatch(
@@ -117,11 +120,17 @@ const Assets = () => {
                             metadata.picture += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
                         }
 
+                        // Get listed price from escrow contract
+                        const listedPrice = await escrowContract.getTokenPrice(i);
+                        console.log("Raw listed price:", listedPrice.toString());
+                        console.log("Formatted price:", ethers.utils.formatEther(listedPrice));
+
                         ownedTokens.push({
                             tokenId: i,
                             balance: tokenIds[i].toString(),
                             uri: processedUri,
-                            metadata: metadata
+                            metadata: metadata,
+                            listedPrice: listedPrice.toString() === '0' ? 'Not Listed' : ethers.utils.formatEther(listedPrice)
                         });
                     } catch (error) {
                         console.error(`Error processing token ${i}:`, error);
@@ -277,6 +286,9 @@ const Assets = () => {
                                     </Typography>
                                     <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
                                         Owned: {nft.balance}
+                                    </Typography>
+                                    <Typography variant="subtitle1" color="primary" sx={{ mt: 1 }}>
+                                        Listed Price: {nft.listedPrice} MNT
                                     </Typography>
                                 </Box>
                             </CardContent>
