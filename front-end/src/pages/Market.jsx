@@ -9,6 +9,7 @@ import {
     Typography,
     Button,
     TextField,
+    Alert,
 } from '@mui/material';
 import { ethers } from 'ethers';
 import RealEstateTokenABI from '../assets/contracts/RealEstateToken.abi.json';
@@ -93,6 +94,65 @@ const mockNFTs = [
 
 const Market = () => {
     const [ownedNFTs, setOwnedNFTs] = useState([]);
+    const [account, setAccount] = useState(null);
+    const [error, setError] = useState(null);
+    const [amounts, setAmounts] = useState({});
+
+    const connectWallet = async () => {
+        try {
+            if (window.ethereum) {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                setAccount(accounts[0]);
+                setError(null);
+            } else {
+                setError('Please install MetaMask!');
+            }
+        } catch (error) {
+            setError('Failed to connect wallet: ' + error.message);
+        }
+    };
+
+    const handleAmountChange = (tokenId, value) => {
+        setAmounts(prev => ({
+            ...prev,
+            [tokenId]: value
+        }));
+    };
+
+    const buyToken = async (tokenId, price) => {
+        try {
+            if (!account) {
+                setError('Please connect your wallet first');
+                return;
+            }
+
+            const amount = amounts[tokenId];
+            if (!amount || amount <= 0) {
+                setError('Please enter a valid amount');
+                return;
+            }
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const escrowContract = new ethers.Contract(TARGET_ADDRESS, EscrowABI, signer);
+
+            // Calculate total price (price per unit * amount)
+            const pricePerUnit = ethers.utils.parseEther(price.toString());
+            const totalPrice = pricePerUnit.mul(amount);
+
+            // Call buyToken function
+            const tx = await escrowContract.buyToken(CONTRACT_ADDRESS, tokenId, amount, {
+                value: totalPrice
+            });
+
+            await tx.wait();
+            setError(null);
+            // Refresh NFTs after successful purchase
+            readNFTs();
+        } catch (error) {
+            setError('Failed to buy token: ' + error.message);
+        }
+    };
 
     const readNFTs = async () => {
         try {
@@ -184,6 +244,20 @@ const Market = () => {
 
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
+            {!account && (
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+                    <Button variant="contained" color="primary" onClick={connectWallet}>
+                        Connect Wallet
+                    </Button>
+                </Box>
+            )}
+
+            {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                    {error}
+                </Alert>
+            )}
+
             <Grid container spacing={4} justifyContent="center" alignItems="stretch">
                 {ownedNFTs.map((nft) => (
                     <Grid item key={nft.tokenId} xs={12} sm={6} md={4} display="flex">
@@ -250,8 +324,10 @@ const Market = () => {
                                     variant="outlined"
                                     size="small"
                                     fullWidth
+                                    value={amounts[nft.tokenId] || ''}
+                                    onChange={(e) => handleAmountChange(nft.tokenId, e.target.value)}
                                     InputProps={{
-                                        inputProps: { min: 1 },
+                                        inputProps: { min: 1, max: nft.balance },
                                         sx: {
                                             color: '#00FF9D',
                                             '& .MuiOutlinedInput-notchedOutline': {
@@ -266,7 +342,13 @@ const Market = () => {
                                         sx: { color: '#00FF9D' }
                                     }}
                                 />
-                                <Button variant="contained" color="success" fullWidth>
+                                <Button
+                                    variant="contained"
+                                    color="success"
+                                    fullWidth
+                                    onClick={() => buyToken(nft.tokenId, nft.listedPrice)}
+                                    disabled={!account || nft.listedPrice === 'Not Listed'}
+                                >
                                     Buy
                                 </Button>
                             </CardActions>
