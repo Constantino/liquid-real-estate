@@ -58,7 +58,12 @@ const Realtor = () => {
             const tx = await contract.mint(addressAccount, amount, cid, "0x");
             await tx.wait();
             console.log("Mint successful:", tx);
-            return tx;
+
+            // Get the next token ID
+            const nextTokenId = await contract._nextTokenId();
+            console.log("Next Token ID:", nextTokenId.toString());
+
+            return nextTokenId;
         } catch (error) {
             console.error("Mint failed:", error);
             throw error;
@@ -115,8 +120,9 @@ const Realtor = () => {
                 const mintResult = await mint(import.meta.env.VITE_ESCROW_ADDRESS, form.units, processedUri);
                 console.log("mintResult: ", mintResult);
 
-                // const listResult = await listForMarket(mintResult.tokenId, form.price);
-                // console.log("listResult: ", listResult);
+                // Convert price from ETH to wei
+                const priceInWei = ethers.utils.parseEther(form.price);
+                const listResult = await listForMarket(mintResult, priceInWei);
             } catch (error) {
                 console.error("Error:", error);
                 alert('Error occurred. Please try again.');
