@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { ethers } from 'ethers';
 import RealEstateTokenABI from '../assets/contracts/RealEstateToken.abi.json';
+import EscrowABI from '../assets/contracts/Escrow.abi.json';
 
 const MANTLE_SEPOLIA_RPC = 'https://rpc.sepolia.mantle.xyz';
 const CONTRACT_ADDRESS = import.meta.env.VITE_REAL_ESTATE_TOKEN_ADDRESS;
@@ -96,10 +97,11 @@ const Market = () => {
     const readNFTs = async () => {
         try {
             const provider = new ethers.providers.JsonRpcProvider(MANTLE_SEPOLIA_RPC);
-            const contract = new ethers.Contract(CONTRACT_ADDRESS, RealEstateTokenABI, provider);
+            const tokenContract = new ethers.Contract(CONTRACT_ADDRESS, RealEstateTokenABI, provider);
+            const escrowContract = new ethers.Contract(TARGET_ADDRESS, EscrowABI, provider);
 
             // Get all token IDs
-            const tokenIds = await contract.balanceOfBatch(
+            const tokenIds = await tokenContract.balanceOfBatch(
                 Array(100).fill(TARGET_ADDRESS), // Assuming max 100 different token IDs
                 Array(100).fill().map((_, i) => i) // Start from 0
             );
@@ -109,7 +111,8 @@ const Market = () => {
             for (let i = 0; i < tokenIds.length; i++) {
                 if (tokenIds[i].gt(0)) {
                     try {
-                        const uri = await contract.uri(i);
+                        console.log("tokenId to process: ", i);
+                        const uri = await tokenContract.uri(i);
                         console.log('Original URI:', uri);
 
                         // Process the URI
@@ -144,11 +147,20 @@ const Market = () => {
                             metadata.picture += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
                         }
 
+                        console.log("escrowContract: ", escrowContract);
+
+                        // Get listed price from escrow contract
+                        console.log("Fetching price for tokenId:", i);
+                        const listedPrice = await escrowContract.getTokenPrice(i);
+                        console.log("Raw listed price:", listedPrice.toString());
+                        console.log("Formatted price:", ethers.utils.formatEther(listedPrice));
+
                         ownedTokens.push({
                             tokenId: i,
                             balance: tokenIds[i].toString(),
                             uri: processedUri,
-                            metadata: metadata
+                            metadata: metadata,
+                            listedPrice: listedPrice.toString() === '0' ? 'Not Listed' : ethers.utils.formatEther(listedPrice)
                         });
                     } catch (error) {
                         console.error(`Error processing token ${i}:`, error);
@@ -219,7 +231,7 @@ const Market = () => {
                                 </Typography>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                                     <Typography variant="subtitle1" color="primary">
-                                        {nft.metadata.price || '0 MNT'}
+                                        {nft.listedPrice} MNT
                                     </Typography>
                                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                                         <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
