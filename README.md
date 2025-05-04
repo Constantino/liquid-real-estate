@@ -69,27 +69,27 @@ npm run dev
 
 ## Smart Contracts
 
-### Real Estate Token (ERC-1155)
+### Real Estate Token (ERC-1155) (MANTLE NETWORK)
 - **Address**: `0x2855221327E2C93474Bf3041bd8217C31b48Da36`
 - **Purpose**: Manages property fractionalization and unit ownership
 - **Features**: Minting, transferring, and tracking property units
 
-### Escrow
+### Escrow (MANTLE NETWORK)
 - **Address**: `0x7933d67FFe76E2a202Fd198DE7DA7Dec48c35d3A`
 - **Purpose**: Handles secure property token transfers and payments
 - **Features**: Safe exchange of tokens and funds
 
-### Loan Handler
+### Loan Handler (MANTLE NETWORK)
 - **Address**: `0xa6145e0136bFF0f3c9d9505da62f35D7E202ef79`
 - **Purpose**: Manages loan creation and tracking
 - **Features**: Loan origination, repayment tracking, collateral management
 
-### Liquidity Pool
+### Liquidity Pool (ARBITRUM NETWORK)
 - **Address**: `0x14b1BcDe6f1eE136D143ea5EF29557022c37482A`
 - **Purpose**: Facilitates cross-chain liquidity provision
 - **Features**: Investment management, yield distribution
 
-### MXNB Token
+### MXNB Token (ARBITRUM NETWORK)
 - **Address**: `0x82B9e52b26A2954E113F94Ff26647754d5a4247D`
 - **Purpose**: Stablecoin for loan operations
 - **Features**: Cross-chain transfers, stable value
