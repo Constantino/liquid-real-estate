@@ -15,7 +15,7 @@ import RealEstateTokenABI from '../assets/contracts/RealEstateToken.abi.json';
 
 const MANTLE_SEPOLIA_RPC = 'https://rpc.sepolia.mantle.xyz';
 const CONTRACT_ADDRESS = import.meta.env.VITE_REAL_ESTATE_TOKEN_ADDRESS;
-const TARGET_ADDRESS = '0x57D14581DE26173D37e854ce8d3A6468A1943f56';
+const TARGET_ADDRESS = import.meta.env.VITE_ESCROW_ADDRESS;
 
 const mockNFTs = [
     {
@@ -114,13 +114,17 @@ const Market = () => {
 
                         // Process the URI
                         let processedUri = uri;
-                        if (uri.includes('ipfs://')) {
-                            processedUri = uri.replace('ipfs://', import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS);
-                        } else if (uri.includes('https://ipfs.io/ipfs/')) {
-                            processedUri = uri.replace('https://ipfs.io/ipfs/', import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS);
+
+                        // Remove ipfs.io suffix if present
+                        if (processedUri.includes('https://ipfs.io/ipfs/')) {
+                            processedUri = processedUri.replace('https://ipfs.io/ipfs/', '');
                         }
 
-                        processedUri += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
+                        // Only add the token if it's not already in the URL
+                        if (!processedUri.includes('pinataGatewayToken')) {
+                            processedUri += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
+                        }
+
                         console.log('Processed URI:', processedUri);
 
                         // Fetch the metadata

@@ -10,6 +10,7 @@ import {
 import { PinataSDK } from "pinata";
 import { ethers } from 'ethers';
 import RealEstateTokenABI from '../assets/contracts/RealEstateToken.abi.json';
+import EscrowABI from '../assets/contracts/Escrow.abi.json';
 
 const Realtor = () => {
 
@@ -23,6 +24,26 @@ const Realtor = () => {
         const upload = await pinata.upload.public.file(file);
         console.log(upload);
     }
+
+    const listForMarket = async (tokenId, price) => {
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(
+                import.meta.env.VITE_ESCROW_ADDRESS,
+                EscrowABI,
+                signer
+            );
+
+            const tx = await contract.listToken(tokenId, price);
+            await tx.wait();
+            console.log("Token listed successfully:", tx);
+            return tx;
+        } catch (error) {
+            console.error("Error listing token:", error);
+            throw error;
+        }
+    };
 
     const mint = async (addressAccount, amount, cid) => {
         try {
@@ -50,6 +71,7 @@ const Realtor = () => {
         units: '',
         picture: null,
         pictureUrl: '',
+        price: '',
     });
 
     const handleChange = (e) => {
@@ -90,7 +112,11 @@ const Realtor = () => {
                 console.log("full metadata: ", processedUri);
 
                 // Call mint function with escrow address
-                await mint(import.meta.env.VITE_ESCROW_ADDRESS, form.units, processedUri);
+                const mintResult = await mint(import.meta.env.VITE_ESCROW_ADDRESS, form.units, processedUri);
+                console.log("mintResult: ", mintResult);
+
+                // const listResult = await listForMarket(mintResult.tokenId, form.price);
+                // console.log("listResult: ", listResult);
             } catch (error) {
                 console.error("Error:", error);
                 alert('Error occurred. Please try again.');
@@ -163,6 +189,16 @@ const Realtor = () => {
                         onChange={handleChange}
                         required
                         inputProps={{ min: 1 }}
+                        fullWidth
+                    />
+                    <TextField
+                        label="Price"
+                        name="price"
+                        type="number"
+                        value={form.price}
+                        onChange={handleChange}
+                        required
+                        inputProps={{ min: 0, step: "0.000000000000000001" }}
                         fullWidth
                     />
                     <Button type="submit" variant="contained" color="success" size="large" fullWidth>
