@@ -122,7 +122,7 @@ const Realtor = () => {
 
                 // Convert price from ETH to wei
                 const priceInWei = ethers.utils.parseEther(form.price);
-                const listResult = await listForMarket(mintResult, priceInWei);
+                const listResult = await listForMarket(mintResult - 1, priceInWei);
             } catch (error) {
                 console.error("Error:", error);
                 alert('Error occurred. Please try again.');
