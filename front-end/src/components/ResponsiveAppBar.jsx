@@ -13,8 +13,9 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import { useNavigate, Link } from 'react-router-dom';
 import liquidRealEstateLogo from '../assets/liquid_re_logo.png';
-import { ConnectButton, darkTheme, lightTheme } from "thirdweb/react";
-import { createThirdwebClient } from "thirdweb";
+import { ethers } from 'ethers';
+// import { ConnectButton, darkTheme, lightTheme } from "thirdweb/react";
+// import { createThirdwebClient } from "thirdweb";
 
 const pages = [
     { name: 'Realtor', path: '/realtor' },
@@ -28,6 +29,7 @@ const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 function ResponsiveAppBar() {
     const [anchorElNav, setAnchorElNav] = React.useState(null);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const [account, setAccount] = React.useState(null);
     const navigate = useNavigate();
 
     const handleOpenNavMenu = (event) => {
@@ -50,9 +52,27 @@ function ResponsiveAppBar() {
         navigate(path);
     };
 
-    const client = createThirdwebClient({
-        clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
-    });
+    const connectWallet = async () => {
+        try {
+            if (!window.ethereum) {
+                alert('Please install MetaMask!');
+                return;
+            }
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const accounts = await provider.send("eth_requestAccounts", []);
+            setAccount(accounts[0]);
+        } catch (error) {
+            console.error("Error connecting wallet:", error);
+        }
+    };
+
+    const disconnectWallet = () => {
+        setAccount(null);
+    };
+
+    // const client = createThirdwebClient({
+    //     clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
+    // });
 
     return (
         <AppBar
@@ -141,7 +161,27 @@ function ResponsiveAppBar() {
                             </Button>
                         ))}
                     </Box>
-                    <ConnectButton theme={darkTheme({
+
+                    <Button
+                        variant="outlined"
+                        onClick={account ? disconnectWallet : connectWallet}
+                        sx={{
+                            color: '#00FF9D',
+                            borderColor: '#00FF9D',
+                            '&:hover': {
+                                borderColor: '#00FF9D',
+                                backgroundColor: 'rgba(0, 255, 157, 0.08)',
+                            }
+                        }}
+                    >
+                        {account ? (
+                            <Tooltip title="Disconnect Wallet">
+                                <span>{`${account.slice(0, 6)}...${account.slice(-4)}`}</span>
+                            </Tooltip>
+                        ) : 'Connect Wallet'}
+                    </Button>
+
+                    {/* <ConnectButton theme={darkTheme({
                         colors: {
                             primaryButtonBg: 'rgba(0,255,157,0.08)',
                             primaryButtonText: '#00FF9D',
@@ -151,7 +191,7 @@ function ResponsiveAppBar() {
                         connectButton={{
                             label: "Connect Wallet",
                         }}
-                        client={client} />
+                        client={client} /> */}
                     {/* <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

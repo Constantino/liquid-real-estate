@@ -8,6 +8,8 @@ import {
     Paper,
 } from '@mui/material';
 import { PinataSDK } from "pinata";
+import { ethers } from 'ethers';
+import RealEstateTokenABI from '../assets/contracts/RealEstateToken.abi.json';
 
 const Realtor = () => {
 
@@ -21,6 +23,26 @@ const Realtor = () => {
         const upload = await pinata.upload.public.file(file);
         console.log(upload);
     }
+
+    const mint = async (addressAccount, amount, cid) => {
+        try {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(
+                import.meta.env.VITE_REAL_ESTATE_TOKEN_ADDRESS,
+                RealEstateTokenABI,
+                signer
+            );
+
+            const tx = await contract.mint(addressAccount, amount, cid, "0x");
+            await tx.wait();
+            console.log("Mint successful:", tx);
+            return tx;
+        } catch (error) {
+            console.error("Mint failed:", error);
+            throw error;
+        }
+    };
 
     const [form, setForm] = useState({
         name: '',
@@ -54,21 +76,31 @@ const Realtor = () => {
 
         let metadataCid;
         if (form.picture) {
-            const imageFile = new File([form.picture], form.picture.name, { type: form.picture.type });
-            // You can now use imageFile for upload
-            console.log('Image file ready for upload:', imageFile);
+            try {
+                const imageFile = new File([form.picture], form.picture.name, { type: form.picture.type });
+                const upload = await pinata.upload.public.file(imageFile);
+                const pictureCid = upload.cid;
+                metadata.picture = import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS + pictureCid;
 
-            const upload = await pinata.upload.public.file(imageFile);
-            const pictureCid = upload.cid;
-            metadata.picture = import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS + pictureCid;
+                const uploadMetadata = await pinata.upload.public.json(metadata)
+                metadataCid = uploadMetadata.cid;
 
-            const uploadMetadata = await pinata.upload.public.json(metadata)
-            metadataCid = uploadMetadata.cid;
+                console.log("full metadata: ", import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS + metadataCid);
 
-            console.log("full metadata: ", import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS + metadataCid);
+                // Get the current account
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                const account = accounts[0];
+
+                // Call mint function
+                const result = await mint(account, form.units, metadataCid);
+                console.log("Mint result:", result);
+                alert('Minted!');
+            } catch (error) {
+                console.error("Error:", error);
+                alert('Error occurred. Please try again.');
+            }
         }
-
-
     };
 
     return (

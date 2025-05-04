@@ -11,8 +11,8 @@ import Market from './pages/Market'
 import Assets from './pages/Assets'
 import Loans from './pages/Loans'
 import Investor from './pages/Investor'
-import { ConnectButton, darkTheme, lightTheme } from "thirdweb/react";
-import { createThirdwebClient } from "thirdweb";
+// import { ConnectButton, darkTheme, lightTheme } from "thirdweb/react";
+// import { createThirdwebClient } from "thirdweb";
 
 // Create a dark theme
 const darkThemeLocal = createTheme({
@@ -48,63 +48,63 @@ const darkThemeLocal = createTheme({
   },
 })
 
-const client = createThirdwebClient({
-  clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
-});
+// const client = createThirdwebClient({
+//   clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
+// });
 
 function App() {
   return (
-    <ThirdwebProvider>
+    // <ThirdwebProvider>
 
 
-      <Router>
-        <ThemeProvider theme={darkThemeLocal}>
-          <CssBaseline />
-          <ResponsiveAppBar />
-          <Container maxWidth="lg" sx={{ mt: 4 }}>
-            <Routes>
-              <Route path="/" element={
-                <Box
-                  sx={{
-                    minHeight: '100vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 2,
-                  }}
-                >
-                  <Typography variant="h1" component="h1" sx={{ mb: 2 }}>
-                    Liquid Real Estate
-                  </Typography>
-                  <Typography variant="h4" component="h4" sx={{ mb: 2 }}>
-                    Own your piece of real estate with hyper liquidity.
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 2 }}>
-                    <ConnectButton theme={darkTheme({
-                      colors: {
-                        primaryButtonBg: 'rgba(0,255,157,0.08)',
-                        primaryButtonText: '#00FF9D',
-                      }
-                    })
+    <Router>
+      <ThemeProvider theme={darkThemeLocal}>
+        <CssBaseline />
+        <ResponsiveAppBar />
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Routes>
+            <Route path="/" element={
+              <Box
+                sx={{
+                  minHeight: '100vh',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 2,
+                }}
+              >
+                <Typography variant="h1" component="h1" sx={{ mb: 2 }}>
+                  Liquid Real Estate
+                </Typography>
+                <Typography variant="h4" component="h4" sx={{ mb: 2 }}>
+                  Own your piece of real estate with hyper liquidity.
+                </Typography>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                  {/* <ConnectButton theme={darkTheme({
+                    colors: {
+                      primaryButtonBg: 'rgba(0,255,157,0.08)',
+                      primaryButtonText: '#00FF9D',
                     }
-                      connectButton={{
-                        label: "Connect Wallet",
-                      }}
-                      client={client} />
-                  </Box>
+                  })
+                  }
+                    connectButton={{
+                      label: "Connect Wallet",
+                    }}
+                    client={client} /> */}
                 </Box>
-              } />
-              <Route path="/realtor" element={<Realtor />} />
-              <Route path="/market" element={<Market />} />
-              <Route path="/assets" element={<Assets />} />
-              <Route path="/loans" element={<Loans />} />
-              <Route path="/investor" element={<Investor />} />
-            </Routes>
-          </Container>
-        </ThemeProvider>
-      </Router>
-    </ThirdwebProvider>
+              </Box>
+            } />
+            <Route path="/realtor" element={<Realtor />} />
+            <Route path="/market" element={<Market />} />
+            <Route path="/assets" element={<Assets />} />
+            <Route path="/loans" element={<Loans />} />
+            <Route path="/investor" element={<Investor />} />
+          </Routes>
+        </Container>
+      </ThemeProvider>
+    </Router>
+    // </ThirdwebProvider>
   )
 }
 
