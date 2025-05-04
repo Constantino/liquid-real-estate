@@ -341,7 +341,7 @@ const Assets = () => {
                         <Typography variant="subtitle1" color="primary">
                             Interest: {INTEREST_RATE}% annually
                         </Typography>
-                        <TextField label="Time" name="time" fullWidth />
+                        <TextField label="Time (months)" name="time" type="number" fullWidth />
                     </Box>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
