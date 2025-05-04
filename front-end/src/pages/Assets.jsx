@@ -357,6 +357,8 @@ const Assets = () => {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 height: '100%',
+                                maxWidth: '300px',
+                                width: '100%',
                                 cursor: 'pointer',
                                 border: selected.includes(nft.tokenId) ? '2px solid #00FF9D' : 'none',
                                 transition: 'box-shadow 0.2s, border-color 0.2s',
@@ -398,7 +400,11 @@ const Assets = () => {
                                 height="180"
                                 image={nft.metadata.picture}
                                 alt={nft.metadata.name}
-                                sx={{ objectFit: 'cover' }}
+                                sx={{
+                                    objectFit: 'cover',
+                                    width: '100%',
+                                    height: '180px'
+                                }}
                             />
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography gutterBottom variant="h6" component="div">
