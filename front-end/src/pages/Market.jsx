@@ -244,6 +244,14 @@ const Market = () => {
 
     return (
         <Box sx={{ flexGrow: 1, mt: 6 }}>
+            {!account && (
+                <Box sx={{ mb: 2, display: 'flex', justifyContent: 'center' }}>
+                    <Button variant="contained" color="primary" onClick={connectWallet}>
+                        Connect Wallet
+                    </Button>
+                </Box>
+            )}
+
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}
@@ -259,6 +267,8 @@ const Market = () => {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 height: '100%',
+                                maxWidth: '300px',
+                                width: '100%',
                                 cursor: 'pointer',
                                 border: 'none',
                                 transition: 'box-shadow 0.2s',
@@ -286,7 +296,11 @@ const Market = () => {
                                 height="180"
                                 image={nft.metadata.picture}
                                 alt={nft.metadata.name}
-                                sx={{ objectFit: 'cover' }}
+                                sx={{
+                                    objectFit: 'cover',
+                                    width: '100%',
+                                    height: '180px'
+                                }}
                             />
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Typography gutterBottom variant="h6" component="div">
