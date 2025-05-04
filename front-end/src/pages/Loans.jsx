@@ -310,8 +310,20 @@ const Loans = () => {
                                     sx={{
                                         background: 'linear-gradient(90deg, #00FF9D 0%, #00B8FF 100%)',
                                         color: '#000',
+                                        fontWeight: 'bold',
+                                        fontSize: '1rem',
+                                        padding: '8px 24px',
+                                        borderRadius: '8px',
+                                        textTransform: 'none',
+                                        boxShadow: '0 2px 8px rgba(0, 255, 157, 0.3)',
                                         '&:hover': {
                                             background: 'linear-gradient(90deg, #00B8FF 0%, #00FF9D 100%)',
+                                            boxShadow: '0 4px 12px rgba(0, 255, 157, 0.4)',
+                                        },
+                                        '&:disabled': {
+                                            background: 'rgba(0, 255, 157, 0.1)',
+                                            color: 'rgba(0, 0, 0, 0.3)',
+                                            boxShadow: 'none',
                                         },
                                     }}
                                 >
