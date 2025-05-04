@@ -70,6 +70,10 @@ function ResponsiveAppBar() {
         setAccount(null);
     };
 
+    React.useEffect(() => {
+        connectWallet();
+    }, []);
+
     // const client = createThirdwebClient({
     //     clientId: import.meta.env.VITE_THIRDWEB_CLIENT_ID,
     // });
