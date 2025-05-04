@@ -166,6 +166,43 @@ const Loans = () => {
         }
     }, []);
 
+    const handlePayLoan = async (loanId) => {
+        try {
+            if (!window.ethereum) {
+                throw new Error('Please install MetaMask!');
+            }
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(LOAN_HANDLER_ADDRESS, LoanHandlerABI, signer);
+
+            // Get loan details to calculate payment amount
+            const [borrower, collateralValue, interestRate, loanAmount, time, totalPayment, isActive] = await contract.getLoan(loanId);
+
+            if (!isActive) {
+                throw new Error('This loan is not active');
+            }
+
+            // Send the transaction with the total payment amount
+            const tx = await contract.payLoan(loanId, { value: totalPayment });
+            await tx.wait();
+
+            // Update the loan status in localStorage
+            const updatedLoans = loans.map(loan => {
+                if (loan.loanId === loanId) {
+                    return { ...loan, status: 'Paid' };
+                }
+                return loan;
+            });
+            setLoans(updatedLoans);
+            localStorage.setItem('loanRequests', JSON.stringify(updatedLoans));
+
+        } catch (error) {
+            console.error('Error paying loan:', error);
+            setError(error.message);
+        }
+    };
+
     return (
         <Box sx={{ flexGrow: 1, mt: 6, position: 'relative' }}>
             {!account && (
@@ -257,13 +294,30 @@ const Loans = () => {
                                         Total Payment: {loan.totalPayment} MNT
                                     </Typography>
                                     <Typography variant="subtitle2" sx={{ color: '#00FF9D' }}>
-                                        Status: Pending
+                                        Status: {loan.status || 'Pending'}
                                     </Typography>
                                     <Typography variant="caption" color="text.secondary">
                                         Requested: {new Date(loan.timestamp).toLocaleString()}
                                     </Typography>
                                 </Box>
                             </CardContent>
+                            <CardActions sx={{ p: 2, justifyContent: 'center' }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => handlePayLoan(loan.loanId)}
+                                    disabled={!account || loan.status === 'Paid'}
+                                    sx={{
+                                        background: 'linear-gradient(90deg, #00FF9D 0%, #00B8FF 100%)',
+                                        color: '#000',
+                                        '&:hover': {
+                                            background: 'linear-gradient(90deg, #00B8FF 0%, #00FF9D 100%)',
+                                        },
+                                    }}
+                                >
+                                    {loan.status === 'Paid' ? 'Paid' : 'Pay Loan'}
+                                </Button>
+                            </CardActions>
                         </Card>
                     </Grid>
                 ))}
