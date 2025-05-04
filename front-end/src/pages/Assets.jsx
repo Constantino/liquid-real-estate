@@ -39,8 +39,19 @@ const Assets = () => {
         );
     };
 
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleOpen = () => {
+        if (selected.length === 0) {
+            setError('Please select at least one NFT to request a loan');
+            return;
+        }
+        setError(null);
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setError(null);
+    };
 
     const connectWallet = async () => {
         try {
@@ -216,7 +227,12 @@ const Assets = () => {
             )}
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                <Button variant="contained" color="primary" onClick={handleOpen}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpen}
+                    disabled={!account || ownedNFTs.length === 0}
+                >
                     Request Loan
                 </Button>
             </Box>
