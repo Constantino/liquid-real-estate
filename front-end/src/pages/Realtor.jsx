@@ -85,17 +85,12 @@ const Realtor = () => {
                 const uploadMetadata = await pinata.upload.public.json(metadata)
                 metadataCid = uploadMetadata.cid;
 
-                console.log("full metadata: ", import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS + metadataCid);
+                let processedUri = import.meta.env.VITE_PINATA_GATEWAY_URL_IPFS + metadataCid;
+                processedUri += `?pinataGatewayToken=${import.meta.env.VITE_PINATA_GATEWAY_TOKEN}`;
+                console.log("full metadata: ", processedUri);
 
-                // Get the current account
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                const accounts = await provider.send("eth_requestAccounts", []);
-                const account = accounts[0];
-
-                // Call mint function
-                const result = await mint(account, form.units, metadataCid);
-                console.log("Mint result:", result);
-                alert('Minted!');
+                // Call mint function with escrow address
+                await mint(import.meta.env.VITE_ESCROW_ADDRESS, form.units, processedUri);
             } catch (error) {
                 console.error("Error:", error);
                 alert('Error occurred. Please try again.');
