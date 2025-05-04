@@ -33,6 +33,7 @@ const Assets = () => {
     const [open, setOpen] = useState(false);
     const [loanAmount, setLoanAmount] = useState(0);
     const [time, setTime] = useState(0);
+    const [loanError, setLoanError] = useState(null);
 
     const handleSelect = (id) => (event) => {
         setSelected((prev) =>
@@ -56,8 +57,27 @@ const Assets = () => {
         setError(null);
     };
 
+    const calculateCollateralValue = () => {
+        return selected.reduce((sum, tokenId) => {
+            const nft = ownedNFTs.find(n => n.tokenId === tokenId);
+            if (nft && nft.listedPrice !== 'Not Listed') {
+                return sum + (parseFloat(nft.balance) * parseFloat(nft.listedPrice));
+            }
+            return sum;
+        }, 0);
+    };
+
     const handleLoanAmountChange = (event) => {
-        setLoanAmount(parseFloat(event.target.value) || 0);
+        const newAmount = parseFloat(event.target.value) || 0;
+        const collateralValue = calculateCollateralValue();
+
+        if (newAmount > collateralValue) {
+            setLoanError('Loan amount cannot exceed collateral value');
+        } else {
+            setLoanError(null);
+        }
+
+        setLoanAmount(newAmount);
     };
 
     const handleTimeChange = (event) => {
@@ -67,7 +87,7 @@ const Assets = () => {
     const calculateTotalPayment = () => {
         const interestAmount = (loanAmount * INTEREST_RATE / 12 * time) / 100;
         const totalPayment = loanAmount + interestAmount;
-        return totalPayment.toFixed(4);
+        return totalPayment.toFixed(18);
     };
 
     const connectWallet = async () => {
@@ -345,13 +365,7 @@ const Assets = () => {
                     </Typography>
                     <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <Typography variant="subtitle1" color="primary">
-                            Collateral value: {selected.reduce((sum, tokenId) => {
-                                const nft = ownedNFTs.find(n => n.tokenId === tokenId);
-                                if (nft && nft.listedPrice !== 'Not Listed') {
-                                    return sum + (parseFloat(nft.balance) * parseFloat(nft.listedPrice));
-                                }
-                                return sum;
-                            }, 0).toFixed(4)} MNT
+                            Collateral value: {calculateCollateralValue().toFixed(4)} MNT
                         </Typography>
                         <TextField
                             label="Loan Amount"
@@ -359,6 +373,8 @@ const Assets = () => {
                             type="number"
                             fullWidth
                             onChange={handleLoanAmountChange}
+                            error={!!loanError}
+                            helperText={loanError}
                         />
                         <Typography variant="subtitle1" color="primary">
                             Interest: {INTEREST_RATE}% annually
@@ -376,7 +392,12 @@ const Assets = () => {
                     </Box>
                     <Box sx={{ flexGrow: 1 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                        <Button variant="contained" color="success" size="large">
+                        <Button
+                            variant="contained"
+                            color="success"
+                            size="large"
+                            disabled={!!loanError}
+                        >
                             Get loan
                         </Button>
                     </Box>
